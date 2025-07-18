@@ -12,6 +12,6 @@ type UserRepository interface {
 	GetByID(id uint) (*entities.User, error)
 	Update(user *entities.User) error
 	Delete(id uint) error
-	GetAll() ([]*entities.User, error)
-	GetByRole(role entities.Role) ([]*entities.User, error)
+	GetAll() ([]entities.User, error)
+	GetByRole(role entities.Role) ([]entities.User, error)
 }

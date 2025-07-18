@@ -24,7 +24,7 @@ func NewAuthService(userRepo repositories.UserRepository) *AuthServiceImpl {
 }
 
 // Register คือเมธอดสำหรับลงทะเบียนผู้ใช้ใหม่
-func (s *AuthServiceImpl) Register(req *entities.RegisterRequest) (*entities.User, error) {
+func (s *AuthServiceImpl) Registerr(req entities.RegisterRequest) (*entities.User, error) {
 	// ตรวจสอบว่ามีอีเมลนี้ในระบบแล้วหรือยัง
 	existingUser, err := s.userRepo.GetByEmail(req.Email)
 	if err != nil {
@@ -60,7 +60,7 @@ func (s *AuthServiceImpl) Register(req *entities.RegisterRequest) (*entities.Use
 }
 
 // Login คือเมธอดสำหรับเข้าสู่ระบบ
-func (s *AuthServiceImpl) Login(req *entities.LoginRequest) (*entities.LoginResponse, error) {
+func (s *AuthServiceImpl) Login(req entities.LoginRequest) (*entities.LoginResponse, error) {
 	// ค้นหาผู้ใช้ด้วยอีเมล
 	user, err := s.userRepo.GetByEmail(req.Email)
 	if err != nil {

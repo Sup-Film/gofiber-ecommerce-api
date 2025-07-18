@@ -42,7 +42,7 @@ func (r *UserRepositoryImpl) GetByEmail(email string) (*entities.User, error) {
 	return user.ToEntity(), nil
 }
 
-func (r *UserRepositoryImpl) GetById(id uint) (*entities.User, error) {
+func (r *UserRepositoryImpl) GetByID(id uint) (*entities.User, error) {
 	var user models.User
 	// .First(&user, id) ส่ง address ของ user เพื่อให้ GORM นำข้อมูลที่ได้มาใส่ใน user
 	// id ตัวที่สองเป็นการระบุเงื่อนไขว่าให้ค้นหาจาก ID ที่ระบุ
@@ -50,6 +50,29 @@ func (r *UserRepositoryImpl) GetById(id uint) (*entities.User, error) {
 		return nil, err
 	}
 	return user.ToEntity(), nil
+}
+
+func (r *UserRepositoryImpl) GetByRole(role entities.Role) ([]entities.User, error) {
+	// ประกาศตัวแปร users เป็น slice ของ models.User
+	var users []models.User
+
+	// ใช้ GORM เพื่อค้นหาผู้ใช้ที่มี role ตรงกับที่ระบุ
+	if err := r.db.Where("role = ?", role).Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	// ประกาศตัวแปร result เป็น slice ของ entities.User
+	// เพื่อเก็บผลลัพธ์ที่แปลงจาก models.User เป็น entities.User
+	var result []entities.User
+
+	// วนลูปผ่านแต่ละ user ใน slice users
+	// และแปลงแต่ละ user เป็น entities.User โดยใช้ ToEntity() เมธอด
+	for _, user := range users {
+		// ใช้ ToEntity() เพื่อแปลง models.User เป็น entities.User
+		// แล้วเพิ่มเข้าไปใน result
+		result = append(result, *user.ToEntity())
+	}
+	return result, nil
 }
 
 func (r *UserRepositoryImpl) Update(user *entities.User) error {
@@ -69,7 +92,7 @@ func (r *UserRepositoryImpl) Delete(id uint) error {
 }
 
 // GetAllUsers ฟังก์ชันสำหรับดึงข้อมูลผู้ใช้ทั้งหมดจากฐานข้อมูล
-func (r *UserRepositoryImpl) GetAllUsers() ([]entities.User, error) {
+func (r *UserRepositoryImpl) GetAll() ([]entities.User, error) {
 
 	// ประกาศตัวแปร users เป็น slice ของ models.User
 	// เพื่อเก็บข้อมูลผู้ใช้ที่ดึงมาจากฐานข้อมูล
