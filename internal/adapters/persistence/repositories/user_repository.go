@@ -67,3 +67,27 @@ func (r *UserRepositoryImpl) Update(user *entities.User) error {
 func (r *UserRepositoryImpl) Delete(id uint) error {
 	return r.db.Delete(&models.User{}, id).Error
 }
+
+// GetAllUsers ฟังก์ชันสำหรับดึงข้อมูลผู้ใช้ทั้งหมดจากฐานข้อมูล
+func (r *UserRepositoryImpl) GetAllUsers() ([]entities.User, error) {
+
+	// ประกาศตัวแปร users เป็น slice ของ models.User
+	// เพื่อเก็บข้อมูลผู้ใช้ที่ดึงมาจากฐานข้อมูล
+	var users []models.User
+	if err := r.db.Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	// สร้างตัวแปรชื่อ result
+	// เป็น slice (อาร์เรย์แบบขยายขนาดได้) ที่เก็บข้อมูลชนิด entities.User (คือ value ไม่ใช่ pointer)
+	// ตอนเริ่มต้น slice นี้จะว่าง (ไม่มีสมาชิก)
+	var result []entities.User
+
+	// วนลูปผ่านแต่ละ user ใน slice users
+	// และแปลงแต่ละ user เป็น entities.User โดยใช้ ToEntity() เมธอด
+	// แล้วเพิ่มเข้าไปใน result
+	for _, user := range users {
+		result = append(result, *user.ToEntity())
+	}
+	return result, nil
+}
