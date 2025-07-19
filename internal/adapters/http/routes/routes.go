@@ -4,13 +4,13 @@ import (
 	"github.com/Sup-Film/fiber-ecommerce-api/internal/adapters/http/handlers"
 	"github.com/Sup-Film/fiber-ecommerce-api/internal/adapters/http/middleware"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/swagger"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
 )
 
 // SetupRoutes กำหนดเส้นทาง (routes) สำหรับแอปพลิเคชัน
 func SetupRoutes(app *fiber.App, authHandler *handlers.AuthHandler) {
 	// Swagger
-	app.Get("/swagger/*", swagger.HandlerDefault)
+	app.Get("/swagger/*", fiberSwagger.HandlerDefault)
 
 	// Api Routes กำหนดกลุ่มเส้นทางสำหรับ API
 	api := app.Group("/api")

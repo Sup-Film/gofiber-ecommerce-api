@@ -26,9 +26,9 @@ func LoadConfig() *Config {
 		DBHost:       getEnv("DB_HOST", "localhost"),
 		DBPort:       getEnv("DB_PORT", "5432"),
 		DBUser:       getEnv("DB_USER", "postgres"),
-		DBPass:       getEnv("DB_PASS", "123456"),
+		DBPass:       getEnv("DB_PASS", "1234"),
 		DBName:       getEnv("DB_NAME", "gofiberecommerce"),
-		DBSSL:        getEnv("DB_SSL", "false"),
+		DBSSL:        getEnv("DB_SSL", "disable"),
 		JWTSecret:    getEnv("JWT_SECRET", "your_jwt_secret"),
 		JWTExpiresIn: getEnv("JWT_EXPIRES_IN", "24h"),
 	}
