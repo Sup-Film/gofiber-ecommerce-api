@@ -4,7 +4,7 @@ import (
 	"github.com/Sup-Film/fiber-ecommerce-api/internal/adapters/http/handlers"
 	"github.com/Sup-Film/fiber-ecommerce-api/internal/adapters/http/middleware"
 	"github.com/gofiber/fiber/v2"
-	fiberSwagger "github.com/swaggo/fiber-swagger"
+	fiberSwagger "github.com/gofiber/swagger"
 )
 
 // SetupRoutes กำหนดเส้นทาง (routes) สำหรับแอปพลิเคชัน
@@ -17,13 +17,18 @@ func SetupRoutes(app *fiber.App, authHandler *handlers.AuthHandler) {
 
 	// Auth Routes
 	auth := api.Group("/auth")
-	auth.Post("/register", authHandler.Register) // Routes ไปเรียกใช้ Handler สำหรับการลงทะเบียนผู้ใช้
-	auth.Post("/login", authHandler.Login)       // Routes ไปเรียกใช้ Handler สำหรับการเข้าสู่ระบบผู้ใช้
+	auth.Post("/register", authHandler.Register)
+	auth.Post("/login", authHandler.Login)
 
-	// Protected Routes
-	admin := api.Group("/admin")
+	// Protect Routes
+	user := api.Group("/user")
+	user.Use(middleware.AuthMiddleware())
+	user.Get("/profile", authHandler.GetUserProfile)
+
+	// Admin Only Routes
 	// กำหนด middleware สำหรับเส้นทางที่ต้องการการยืนยันตัวตนและสิทธิ์
 	// ใช้ middleware สำหรับการตรวจสอบสิทธิ์ที่เขียนไว้ในไฟล์ middleware/auth_middleware.go
+	admin := api.Group("/admin")
 	admin.Use(middleware.AuthMiddleware(), middleware.RoleMiddleware("admin"))
 	admin.Get("/dashboard", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{

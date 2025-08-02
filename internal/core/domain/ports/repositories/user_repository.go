@@ -1,3 +1,4 @@
+// ! Outbound port layer สำหรับติดต่อกับฐานข้อมูลผ่าน
 package repositories
 
 import (
