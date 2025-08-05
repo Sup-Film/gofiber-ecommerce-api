@@ -9,6 +9,8 @@ import (
 
 // SetupRoutes กำหนดเส้นทาง (routes) สำหรับแอปพลิเคชัน
 func SetupRoutes(app *fiber.App, authHandler *handlers.AuthHandler) {
+	adminHandler := handlers.NewAdminHandler()
+
 	// Swagger
 	app.Get("/swagger/*", fiberSwagger.HandlerDefault)
 
@@ -30,9 +32,5 @@ func SetupRoutes(app *fiber.App, authHandler *handlers.AuthHandler) {
 	// ใช้ middleware สำหรับการตรวจสอบสิทธิ์ที่เขียนไว้ในไฟล์ middleware/auth_middleware.go
 	admin := api.Group("/admin")
 	admin.Use(middleware.AuthMiddleware(), middleware.RoleMiddleware("admin"))
-	admin.Get("/dashboard", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"message": "Welcome to the admin dashboard",
-		})
-	})
+	admin.Get("/dashboard", adminHandler.GetDashboard)
 }

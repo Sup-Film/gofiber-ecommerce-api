@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Sup-Film/fiber-ecommerce-api/internal/config"
@@ -10,7 +11,7 @@ import (
 // Claims เป็น struct ที่กำหนดโครงสร้างข้อมูลที่จะถูกเก็บไว้ใน payload ของ JWT
 // เราใช้ struct นี้เพื่อบอกว่าใน Token ของเราจะมีข้อมูลอะไรบ้าง
 type Claims struct {
-	UserID               uint   `json:"user_id"` // เก็บ User ID ของผู้ใช้
+	UserID               string `json:"user_id"` // เก็บ User ID ของผู้ใช้
 	Role                 string `json:"role"`    // เก็บ Role (บทบาท) ของผู้ใช้ เช่น 'admin' หรือ 'user'
 	jwt.RegisteredClaims        // เป็นการฝัง (embed) struct RegisteredClaims จากไลบรารี jwt
 	// ซึ่งจะช่วยให้เราสามารถใช้ Claims มาตรฐานของ JWT ได้ง่ายขึ้น
@@ -31,15 +32,13 @@ func GenerateJWT(userID uint, role string) (string, error) {
 
 	// สร้าง claims หรือ payload สำหรับ Token นี้ โดยใส่ข้อมูล UserID, Role และกำหนดค่ามาตรฐานอื่นๆ
 	claims := &Claims{
-		UserID: userID,
+		UserID: fmt.Sprintf("%d", userID),
 		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			// ExpiresAt กำหนดเวลาหมดอายุของ Token (ในที่นี้คือ 24 ชั่วโมงนับจากเวลาปัจจุบัน)
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 			// IssuedAt กำหนดเวลาที่ Token นี้ถูกสร้างขึ้น
 			IssuedAt: jwt.NewNumericDate(time.Now()),
-			// Issuer กำหนดชื่อของผู้ออก Token (ในที่นี้คือชื่อแอปพลิเคชันของเรา)
-			Issuer: "fiber-ecommerce-api",
 		},
 	}
 

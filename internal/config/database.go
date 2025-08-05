@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/Sup-Film/fiber-ecommerce-api/internal/adapters/persistence/models"
 	"gorm.io/driver/postgres"
@@ -27,14 +28,61 @@ func SetupDatabase(config *Config) *gorm.DB {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
-	// Automatically migrate the schema
-	// นำข้อมูลโมเดล User ไปสร้างตารางในฐานข้อมูล
-	err = db.AutoMigrate(&models.User{})
-	if err != nil {
-		log.Fatalf("failed to migrate database schema: %v", err)
+	if shouldRunMigration() {
+		runMigration(db)
+	} else {
+		autoMigrate := os.Getenv("AUTO_MIGRATE")
+		appEnv := os.Getenv("APP_ENV")
+
+		if autoMigrate == "false" {
+			log.Printf("Auto migration is disabled. Set AUTO_MIGRATE=true to enable it.")
+		} else if appEnv == "production" && autoMigrate != "true" {
+			log.Printf("Skipping migration in production environment. Set AUTO_MIGRATE=true to enable it.")
+		} else {
+			log.Printf("Skipping migration Set AUTO_MIGRATE=true to enable it.")
+		}
 	}
 
-	// ถ้าเชื่อมต่อสำเร็จ
-	log.Println("Database connection established successfully")
 	return db
+}
+
+// สร้างฟังก์ชัน ตรวจสอบว่าควร migrate หรือไม่
+func shouldRunMigration() bool {
+
+	if os.Getenv("AUTO_MIGRATE") == "false" {
+		return false
+	}
+
+	if os.Getenv("AUTO_MIGRATE") == "true" {
+		return true
+	}
+
+	if os.Getenv("APP_ENV") == "development" {
+		return true
+	}
+	return false
+}
+
+// ฟังก์ชันสำหรับ migrate
+func runMigration(db *gorm.DB) {
+	log.Println("Running database migration...")
+
+	err := db.AutoMigrate(&models.User{})
+	if err != nil {
+		log.Fatal("Failed to migrate database:", err)
+	}
+
+	log.Println("Database migration completed successfully")
+}
+
+func RunMigrationManual(config *Config) error {
+	db := SetupDatabase(config)
+
+	log.Println("Running manual database migration...")
+
+	err := db.AutoMigrate(&models.User{})
+	if err != nil {
+		return fmt.Errorf("failed to migrate database: %w", err)
+	}
+	return nil
 }

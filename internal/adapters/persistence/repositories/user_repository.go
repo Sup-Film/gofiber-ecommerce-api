@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"errors"
+
 	"github.com/Sup-Film/fiber-ecommerce-api/internal/adapters/persistence/models"
 	"github.com/Sup-Film/fiber-ecommerce-api/internal/core/domain/entities"
 	"gorm.io/gorm"
@@ -37,6 +39,10 @@ func (r *UserRepositoryImpl) GetByEmail(email string) (*entities.User, error) {
 	// และจะทำให้ไม่สามารถแปลงเป็น Entity ได้
 	// ดังนั้นต้องใช้ pointer เพื่อให้ GORM สามารถแก้ไขข้อมูลได้
 	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil // ถ้าไม่พบผู้ใช้ ให้คืนค่า nil
+		}
+
 		return nil, err
 	}
 	return user.ToEntity(), nil

@@ -41,7 +41,7 @@ func AuthMiddleware() fiber.Handler {
 		}
 
 		// ถ้า Token ถูกต้อง ให้เก็บข้อมูลผู้ใช้ใน context
-		c.Locals("userId", claims.UserID)
+		c.Locals("userID", claims.UserID)
 		c.Locals("role", claims.Role)
 
 		// เรียกใช้ handler ถัดไปใน chain

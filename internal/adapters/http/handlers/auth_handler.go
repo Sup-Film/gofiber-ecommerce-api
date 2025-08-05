@@ -5,6 +5,7 @@
 package handlers
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/Sup-Film/fiber-ecommerce-api/internal/core/domain/entities"
@@ -65,11 +66,7 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 		})
 	}
 
-	// ส่งกลับสถานะ 201 Created พร้อมกับข้อมูลผู้ใช้ที่ลงทะเบียนสำเร็จ
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"message": "User registered successfully",
-		"user":    user,
-	})
+	return c.Status(fiber.StatusCreated).JSON(user)
 }
 
 // Login ฟังก์ชันสำหรับเข้าสู่ระบบผู้ใช้
@@ -116,12 +113,13 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 // @Tags User
 // @Accept json
 // @Produce json
-// @Security ApiKeyAuth
+// @Security BearerAuth
 // @Success 200 {object} entities.User
 // @Failure 401 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Router /api/user/profile [get]
 func (h *AuthHandler) GetUserProfile(c *fiber.Ctx) error {
+	fmt.Println("User ID from context:", c.Locals("userID"))
 	userID := c.Locals("userID").(string)
 	id, err := strconv.ParseUint(userID, 10, 32)
 	if err != nil {
