@@ -41,6 +41,14 @@ type RegisterRequest struct {
 	LastName  string `json:"last_name" validate:"required"`
 }
 
+type AdminRegisterRequest struct {
+	Email     string `json:"email" validate:"required,email"`
+	Password  string `json:"password" validate:"required,min=6"`
+	FirstName string `json:"first_name" validate:"required"`
+	LastName  string `json:"last_name" validate:"required"`
+	Role      Role   `json:"role" validate:"required,oneof=admin user moderator"`
+}
+
 // LoginResponse struct แทนข้อมูลที่ส่งกลับหลังจากเข้าสู่ระบบสำเร็จ
 type LoginResponse struct {
 	Token string `json:"token"`

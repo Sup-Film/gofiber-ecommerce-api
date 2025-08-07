@@ -52,6 +52,7 @@ func main() {
 
 	// เริ่มต้นตั่งค่า Handlers
 	authHandler := handlers.NewAuthHandler(authService)
+	adminHandler := handlers.NewAdminHandler(authService)
 
 	// สร้างแอปพลิเคชัน Fiber
 	app := fiber.New(fiber.Config{
@@ -67,7 +68,7 @@ func main() {
 	app.Use(cors.New())
 
 	// Setup Routes
-	routes.SetupRoutes(app, authHandler)
+	routes.SetupRoutes(app, authHandler, adminHandler)
 
 	// Start the server
 	if err := app.Listen(":3000"); err != nil {

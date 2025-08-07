@@ -3,6 +3,7 @@ package middleware
 import (
 	"strings"
 
+	"github.com/Sup-Film/fiber-ecommerce-api/internal/config"
 	"github.com/Sup-Film/fiber-ecommerce-api/pkg/utils"
 	"github.com/gofiber/fiber/v2"
 )
@@ -33,7 +34,8 @@ func AuthMiddleware() fiber.Handler {
 		// ตรวจสอบ Token ที่ได้รับ
 		// โดยใช้ฟังก์ชัน ValidateJWT ที่เราได้สร้างไว้ใน utils
 		// ถ้า Token ไม่ถูกต้อง จะคืนค่า error
-		claims, err := utils.ValidateJWT(token)
+		cfg, _ := config.LoadConfig()
+		claims, err := utils.ValidateJWT(token, cfg.JWTSecret)
 		if err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Invalid token",

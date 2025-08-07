@@ -1,5 +1,30 @@
 basePath: /
 definitions:
+  entities.AdminRegisterRequest:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/entities.Role'
+        enum:
+        - admin
+        - user
+        - moderator
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    - role
+    type: object
   entities.LoginRequest:
     properties:
       email:
@@ -107,6 +132,44 @@ paths:
       security:
       - BearerAuth: []
       summary: Get admin dashboard
+      tags:
+      - Admin
+  /api/admin/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new admin user
+      parameters:
+      - description: Admin registration data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entities.AdminRegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Register a new admin
       tags:
       - Admin
   /api/auth/login:

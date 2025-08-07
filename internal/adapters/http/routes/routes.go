@@ -8,8 +8,7 @@ import (
 )
 
 // SetupRoutes กำหนดเส้นทาง (routes) สำหรับแอปพลิเคชัน
-func SetupRoutes(app *fiber.App, authHandler *handlers.AuthHandler) {
-	adminHandler := handlers.NewAdminHandler()
+func SetupRoutes(app *fiber.App, authHandler *handlers.AuthHandler, adminHandler *handlers.AdminHandler) {
 
 	// Swagger
 	app.Get("/swagger/*", fiberSwagger.HandlerDefault)
@@ -33,4 +32,5 @@ func SetupRoutes(app *fiber.App, authHandler *handlers.AuthHandler) {
 	admin := api.Group("/admin")
 	admin.Use(middleware.AuthMiddleware(), middleware.RoleMiddleware("admin"))
 	admin.Get("/dashboard", adminHandler.GetDashboard)
+	admin.Post("/register", adminHandler.AdminRegister)
 }

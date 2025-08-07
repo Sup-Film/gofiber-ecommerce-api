@@ -5,6 +5,7 @@ package services
 import (
 	"errors"
 
+	"github.com/Sup-Film/fiber-ecommerce-api/internal/config"
 	"github.com/Sup-Film/fiber-ecommerce-api/internal/core/domain/entities"
 	"github.com/Sup-Film/fiber-ecommerce-api/internal/core/domain/ports/repositories"
 	"github.com/Sup-Film/fiber-ecommerce-api/pkg/utils"
@@ -60,6 +61,40 @@ func (s *AuthServiceImpl) Register(req entities.RegisterRequest) (*entities.User
 	return user, nil
 }
 
+func (s *AuthServiceImpl) AdminRegister(req entities.AdminRegisterRequest) (*entities.User, error) {
+	// ตรวจสอบว่ามีอีเมลนี้ในระบบแล้วหรือยัง
+	existingUser, err := s.userRepo.GetByEmail(req.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingUser != nil {
+		return nil, errors.New("user with this email already exists")
+	}
+
+	hashedPassword, err := utils.HashedPassword(req.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	// เตรียมข้อมูลผู้ใช้ใหม่
+	user := &entities.User{
+		Email:     req.Email,
+		Password:  hashedPassword,
+		FirstName: req.FirstName,
+		LastName:  req.LastName,
+		Role:      entities.RoleModerator, // ใช้ Role ที่ส่งมาจาก request
+		IsActive:  true,                   // กำหนดค่าเริ่มต้นให้ Active
+	}
+
+	err = s.userRepo.Create(user)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
 // Login คือเมธอดสำหรับเข้าสู่ระบบ
 func (s *AuthServiceImpl) Login(req entities.LoginRequest) (*entities.LoginResponse, error) {
 	// ค้นหาผู้ใช้ด้วยอีเมล
@@ -79,7 +114,8 @@ func (s *AuthServiceImpl) Login(req entities.LoginRequest) (*entities.LoginRespo
 	}
 
 	// สร้าง JWT Token สำหรับผู้ใช้
-	token, err := utils.GenerateJWT(user.ID, string(user.Role))
+	cfg, _ := config.LoadConfig()
+	token, err := utils.GenerateJWT(user.ID, string(user.Role), cfg.JWTSecret)
 	if err != nil {
 		return nil, err
 	}
