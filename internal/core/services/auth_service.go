@@ -83,8 +83,8 @@ func (s *AuthServiceImpl) AdminRegister(req entities.AdminRegisterRequest) (*ent
 		Password:  hashedPassword,
 		FirstName: req.FirstName,
 		LastName:  req.LastName,
-		Role:      entities.RoleModerator, // ใช้ Role ที่ส่งมาจาก request
-		IsActive:  true,                   // กำหนดค่าเริ่มต้นให้ Active
+		Role:      req.Role, // ใช้ Role ที่ส่งมาจาก request
+		IsActive:  true,     // กำหนดค่าเริ่มต้นให้ Active
 	}
 
 	err = s.userRepo.Create(user)
