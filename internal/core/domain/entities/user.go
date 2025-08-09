@@ -30,20 +30,20 @@ type User struct {
 // LoginRequest struct แทนข้อมูลที่ใช้ในการเข้าสู่ระบบ
 type LoginRequest struct {
 	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=6"`
+	Password string `json:"password" validate:"required,min=8"`
 }
 
 // RegisterRequest struct แทนข้อมูลที่ใช้ในการลงทะเบียนผู้ใช้ใหม่
 type RegisterRequest struct {
 	Email     string `json:"email" validate:"required,email"`
-	Password  string `json:"password" validate:"required,min=6"`
+	Password  string `json:"password" validate:"required,password_complex"`
 	FirstName string `json:"first_name" validate:"required"`
 	LastName  string `json:"last_name" validate:"required"`
 }
 
 type AdminRegisterRequest struct {
 	Email     string `json:"email" validate:"required,email"`
-	Password  string `json:"password" validate:"required,min=6"`
+	Password  string `json:"password" validate:"required,password_complex"`
 	FirstName string `json:"first_name" validate:"required"`
 	LastName  string `json:"last_name" validate:"required"`
 	Role      Role   `json:"role" validate:"required,oneof=admin user moderator"`

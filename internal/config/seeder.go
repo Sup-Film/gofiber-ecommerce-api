@@ -43,8 +43,9 @@ func SeedAdminUser(db *gorm.DB, config *Config) error {
 	}
 
 	// ตรวจสอบความยาวของรหัสผ่าน
-	if len(config.AdminPassword) < 8 {
-		log.Println("⚠️  ADMIN_PASSWORD must be at least 8 characters long, skipping admin user seeding")
+	if err := utils.ValidatePassword(config.AdminPassword); err != nil {
+		log.Printf("❌ Error validating admin password: %v", err)
+		log.Printf("⚠️ Admin password must contain at least 8 characters, one uppercase letter, lowercase letter, one number, and one special character.")
 		return nil
 	}
 
