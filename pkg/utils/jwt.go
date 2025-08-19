@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -10,8 +9,9 @@ import (
 // Claims เป็น struct ที่กำหนดโครงสร้างข้อมูลที่จะถูกเก็บไว้ใน payload ของ JWT
 // เราใช้ struct นี้เพื่อบอกว่าใน Token ของเราจะมีข้อมูลอะไรบ้าง
 type Claims struct {
-	UserID               string `json:"user_id"` // เก็บ User ID ของผู้ใช้
-	Role                 string `json:"role"`    // เก็บ Role (บทบาท) ของผู้ใช้ เช่น 'admin' หรือ 'user'
+	UserID               string `json:"user_id"`
+	Email                string `json:"email"`
+	Role                 string `json:"role"`
 	jwt.RegisteredClaims        // เป็นการฝัง (embed) struct RegisteredClaims จากไลบรารี jwt
 	// ซึ่งจะช่วยให้เราสามารถใช้ Claims มาตรฐานของ JWT ได้ง่ายขึ้น
 	// เช่น 'exp' (Expiration Time), 'iat' (Issued At), 'iss' (Issuer)
@@ -19,16 +19,15 @@ type Claims struct {
 
 // GenerateJWT เป็นฟังก์ชั่นสำหรับสร้าง JWT Token ขึ้นมาใหม่
 // รับค่า userID และ role ของผู้ใช้เป็นพารามิเตอร์ และจะคืนค่ากลับเป็น token (string) และ error (ถ้ามี)
-func GenerateJWT(userID uint, role string, secret string) (string, error) {
+func GenerateJWT(userID, email, role string, secret string) (string, error) {
 	// สร้าง claims หรือ payload สำหรับ Token นี้ โดยใส่ข้อมูล UserID, Role และกำหนดค่ามาตรฐานอื่นๆ
 	claims := &Claims{
-		UserID: fmt.Sprintf("%d", userID),
+		UserID: userID,
+		Email:  email,
 		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
-			// ExpiresAt กำหนดเวลาหมดอายุของ Token (ในที่นี้คือ 24 ชั่วโมงนับจากเวลาปัจจุบัน)
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
-			// IssuedAt กำหนดเวลาที่ Token นี้ถูกสร้างขึ้น
-			IssuedAt: jwt.NewNumericDate(time.Now()),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
 
